@@ -1,0 +1,51 @@
+flowchart LR
+    APP["Client application / Spark notebook"]
+    subgraph FP["file_processing package"]
+      FPP["file_processor.py\nprocess_file / process_files_batch / process_directory"]
+      FPR["registry.py\nget_handler"]
+      FPD["delimited_files.py\nCSV / TSV / delimited"]
+      FPE["excel_file.py\nExcel / pandas"]
+      FPC["csvw_metadata.py / csvw_schema.py / csvw_dialect.py"]
+      FPH["helpers.py / config.py / models.py / exceptions.py"]
+      FPT["tracking.py / checksum.py / delta_tracking.py / storage.py"]
+      FPP --> FPR
+      FPP --> FPD
+      FPP --> FPE
+      FPP --> FPT
+      FPD --> FPC
+      FPD --> FPH
+      FPE --> FPH
+    end
+    subgraph DV["dataframe_validation package"]
+      DVV["csvw/validator.py\nvalidate_csvw_constraints"]
+      DVC["csvw/column.py + csvw/datatype.py"]
+      DVS["dataframe_validation.py\nvalidate_schema / apply_schema"]
+      DVR["constraint_registry.py"]
+      DVH["csvw/models.py / models.py / helpers.py / compat.py / exceptions.py"]
+      DVV --> DVC
+      DVC --> DVR
+      DVS --> DVH
+      DVV --> DVH
+    end
+    subgraph TW["table_writing package"]
+      TWW["writer.py\nwrite_table"]
+      TWV["validation.py\nvalidate_write_options"]
+      TWM["mode_handlers.py\nmode dispatch"]
+      TWF["format_handlers.py\nDelta / Parquet / ORC"]
+      TWH["models.py / config.py / helpers.py / exceptions.py"]
+      TWW --> TWV
+      TWW --> TWM
+      TWM -. "registered writer functions" .-> TWW
+      TWW --> TWF
+      TWW --> TWH
+    end
+    subgraph FM["file_management package"]
+      FMO["file_operations.py\nsafe_move / list_files_in_directory"]
+      FMH["models.py / exceptions.py"]
+      FMO --> FMH
+    end
+    APP -->|"1 process_file"| FPP
+    APP -->|"2 optional validation"| DVV
+    APP -->|"3 write_table"| TWW
+    APP -.->|"optional file operation"| FMO
+    APP -.->|"4 confirm_processed if tracking"| FPT

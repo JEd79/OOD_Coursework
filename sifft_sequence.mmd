@@ -1,0 +1,70 @@
+sequenceDiagram
+    autonumber
+    actor App as Calling application
+    participant FP as file_processing.file_processor
+    participant Track as file_processing.tracking
+    participant Reg as file_processing.registry
+    participant Read as delimited_files / excel_file
+    participant CSVW as CSVW metadata/schema/dialect
+    participant Spark as Spark / pandas
+    participant Val as dataframe_validation
+    participant Writer as table_writing.writer
+    participant Mode as mode_handlers / writer mode functions
+    participant Format as format_handlers / DeltaTable
+    participant Files as file_management
+    App->>FP: process_file(path, spark, ...)
+    opt tracking configured
+      FP->>Track: check_already_processed(...)
+      Track-->>FP: seen / not seen
+    end
+    alt already processed
+      FP-->>App: FileProcessingResult(success=True, dataframe=None)
+    else needs processing
+      FP->>FP: _validate_inputs() -> check_file_exists()
+      FP->>FP: _select_handler() -> registry.get_handler()
+      FP->>FP: _merge_options()
+      FP->>Read: selected handler(path, spark, options)
+      alt delimited file
+        Read->>CSVW: load_csvw_metadata()
+        alt metadata and valid schema
+          Read->>CSVW: csvw_to_spark_schema(), extract_csvw_dialect()
+          Read->>Spark: spark.read.schema(...).csv(path)
+        else no usable metadata
+          Read->>Read: _process_with_inference() / detect_* if auto
+          Read->>Spark: spark.read.csv(path)
+        end
+        Read->>Read: _validate_and_return() / checksum
+      else Excel file
+        Read->>Spark: pandas.read_excel() / spark.createDataFrame()
+      end
+      Read-->>FP: FileProcessingResult
+      FP-->>App: FileProcessingResult
+      opt read succeeded and validation requested
+        App->>Val: validate_csvw_constraints(df, metadata)
+        Val->>Val: column, datatype, primary key checks
+        Val-->>App: CSVWConstraintReport
+      end
+      opt checks pass and write requested
+        App->>Writer: write_table(df, table, spark, options)
+        Writer->>Writer: add_source_metadata() if configured
+        Writer->>Writer: validate_write_options()
+        Writer->>Mode: get_mode_handler() -> registered mode function
+        alt append / overwrite / errorIfExists
+          Mode->>Format: get_format_handler().write()
+          Format->>Spark: df.write.saveAsTable(table)
+        else Delta merge
+          Mode->>Spark: DeltaTable.merge(...).execute()
+        end
+        Mode-->>Writer: TableWriteResult
+        Writer-->>App: TableWriteResult
+      end
+      opt write succeeded and tracking configured
+        App->>FP: confirm_processed(result, spark)
+        FP->>Track: record_processed(...)
+        Track->>Spark: marker via fsspec OR Delta tracking table
+      end
+      opt caller elects to move or list source
+        App->>Files: safe_move() / list_files_in_directory()
+        Files-->>App: FileOperationResult
+      end
+    end

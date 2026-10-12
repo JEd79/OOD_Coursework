@@ -1,0 +1,131 @@
+classDiagram
+  direction TB
+  namespace file_processing {
+    class FileProcessingResult {
+      +bool success
+      +str file
+      +DataFrame dataframe
+      +str message
+      +dict error
+      +int rows_processed
+      +int rows_corrupt
+      +dict metadata
+      +str checksum
+      +dict tracking_context
+    }
+    class TrackingResult {
+      +bool success
+      +str file_path
+      +str location
+      +dict error
+    }
+    class FileProcessingException {
+      +str message
+      +str error_type
+      +str details
+      +to_dict() dict
+    }
+  }
+  namespace dataframe_validation {
+    class ValidationLog {
+      +str message
+      +bool matching
+      +bool missing_column_name
+      +bool type_mismatch
+      +DataType expected_type
+      +DataType actual_type
+    }
+    class ConstraintViolation {
+      +str column
+      +str constraint_type
+      +str message
+      +int violating_rows
+      +int total_rows
+    }
+    class CSVWConstraintReport {
+      +bool valid
+      +list violations
+      +int total_violations
+    }
+    class ValidationException {
+      +str message
+      +str error_type
+      +str details
+      +to_dict() dict
+    }
+  }
+  namespace table_writing {
+    class TableWriteOptions {
+      +str format
+      +str mode
+      +list partition_by
+      +str schema_mode
+      +list merge_keys
+      +bool create_if_not_exists
+      +bool add_source_metadata
+      +dict source_metadata_columns
+      +dict extra_metadata
+    }
+    class TableWriteResult {
+      +bool success
+      +str table_name
+      +int rows_written
+      +int rows_updated
+      +int rows_deleted
+      +str message
+      +dict error
+      +float duration_seconds
+    }
+    class FormatHandler {
+      <<interface>>
+      +supports_merge() bool
+      +write(df, table_name, mode, options)
+    }
+    class DeltaFormatHandler {
+      +supports_merge() bool
+      +write(df, table_name, mode, options)
+    }
+    class ParquetFormatHandler {
+      +supports_merge() bool
+      +write(df, table_name, mode, options)
+    }
+    class OrcFormatHandler {
+      +supports_merge() bool
+      +write(df, table_name, mode, options)
+    }
+    class TableWritingException {
+      +str message
+      +str error_type
+      +str details
+      +to_dict() dict
+    }
+  }
+  namespace file_management {
+    class FileOperation {
+      <<enumeration>>
+      MOVE
+      LIST
+    }
+    class FileOperationResult {
+      +FileOperation operation
+      +str source_path
+      +str destination_path
+      +bool success
+      +list files
+      +dict error
+    }
+    class FileManagementException {
+      +str message
+      +str error_type
+      +str details
+      +to_dict() dict
+    }
+  }
+  CSVWConstraintReport "1" *-- "0..*" ConstraintViolation : violations
+  FileOperationResult --> FileOperation : operation
+  DeltaFormatHandler ..|> FormatHandler : structurally conforms
+  ParquetFormatHandler ..|> FormatHandler : structurally conforms
+  OrcFormatHandler ..|> FormatHandler : structurally conforms
+  DeltaFormatHandler ..> TableWriteOptions : uses
+  ParquetFormatHandler ..> TableWriteOptions : uses
+  OrcFormatHandler ..> TableWriteOptions : uses
