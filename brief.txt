@@ -1,0 +1,80 @@
+===PAGE 1===
+CSF2702: Object Oriented Design – Coursework
+Due: 14:00am, 21st October 2026
+You are part of a software development team that is creating a system for South Wales Hire and Haulage
+(SWHH), a vehicle hire and haulage company. Your team has already carried out a requirements analysis
+and now it is up to you to create a class diagram that models the classes and relationships between classes
+of the SWHH’s hire system. The class diagram must have a fairly low level of abstraction (it should be
+detailed) and should contain enough information that it could be given to a programmer to implement.
+You do NOT need to produce any code for this coursework.
+There are 25 marks available for this coursework and overall the coursework is worth 15% of the module.
+An Important Note
+Make sure that your model sticks to the problem as it is deﬁned below. It can be tempting to think
+ahead and imagine extra or useful features in the system but please do not include these in your class
+diagram, you will not be graded for any additional or unnnessisary additions. Try to stick to the business
+processes involved.
+Essential Functionaliy
+[20 marks]
+Below are the requirements that you will need to work from. The systems needs to store information on
+customers, vehicles and rentals.
+1. Each customer has various details associated with them such as names, contact information and
+drivers licence information.
+2. A drivers license has a number, an expiry date, number of years held and categories of vehicles
+that can be driven.
+3. The company is quite large and therefore hires out a variety of haulage vehicles. The three types
+of vehicle they hire are:
+• Articulated Lorries.
+• Luton Vans.
+• Standard Vans.
+4. All vehicles have a fuel type, left or righthand drive and a gearbox type (automatic/manual), a
+maximum payload weight and a height. Standard Vans have the option of a tow bar attachment,
+Luton Vans have the option of a tail lift, and Articulated Lorries can optionally be hired out with
+a trailer.
+5. The system should be able to add customers, remove customers, add vehicles, remove vehicles and
+produce a list of rentals that begin or end on a given date.
+6. The system should be able to search for available vehicles by specifying the number of seats, the
+make or model or the available storage space (in m3).
+7. The system should be able to create a rental with the following information.
+• The vehicle that is being rented and its current mileage.
+• The date and time the rental begins.
+• How many days the rental is for.
+1
+
+===PAGE 2===
+• The location the car is being collected from and returned to.
+8. A rental should also be able to be cancelled and a customer can only hire one vehicle.
+You can assume that you have Date and Time data types and therefore do not need to create classes
+for them.
+You should ensure that your design covers all of the above requirements and would be implementable ,in
+Java, if given to a programmer.
+• Identifying sensible classes (and potentially subclasses) from the speciﬁcation. [4 Marks]
+• Well chosen attributes and useful operations. [4 Marks]
+• Well chosen relationships between classes (e.g.,associations, aggregations, compositions, etc.). [4
+Marks]
+• Appropriate multiplicities that cover all reasonable requirements. [4 Marks]
+• A design that would allow the system to operate correctly and cover all the requirements. [4 Marks]
+Damage Reports
+[5 marks]
+The company regularly deals with vehicles being returned with some damage and this can lead to disputes
+with the customers. They would like to enforce that every rental has at least two damage reports; one
+at the beginning of the rental and one at the end of a rental. They would like to store information on
+any exterior damage, interior damage and engine problems as textual descriptions. They would also like
+to record whether the damage needs to be ﬁxed and a customer signature.
+Customers should be able to check the damage reports associated with their rental and the company
+would like to be able to produce a list of damage reports that need ﬁxing.
+Marks will be awarded for a good, practical design that could be implemented.
+Submission
+You should submit a single pdf document via Canvas containing the following:
+• The class diagram(s) embedded as readable images within the document.
+• A description of each class and its responsibilities.
+The document should have a logical structure with headings where appropriate. Please ensure that any
+screen shots are suﬃciently readable since they will be printed on A4 paper for marking.
+Submit your work via Canvas before 14:00am, 21st October 2026.
+By submitting coursework, electronically and/or hardcopy, you state that you fully understand and are
+complying with the University’s policy on Academic Integrity and Academic Misconduct.
+The policy
+can be found at https: // myuni. swansea. ac. uk/ academic-life/ academic-misconduct . The con-
+sequences of committing academic misconduct can be extremely serious and may have a profound eﬀect
+on your results and/or further progression. The penalties range from a written reprimand to cancellation
+of all of your marks and withdrawal from the University.
+2
